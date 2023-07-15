@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { LOGO_API_URL } from '../../constants/constants'
 import "./Home.css"
 
 
-const imageURL = 'https://i.postimg.cc/Y0KJVj8T/logo.png';
 
 function Home() {
   return (
@@ -16,7 +16,7 @@ function Home() {
         <Link to="/categories" className="button">Browse Categories</Link>
       </div>
       <div className="right-section">
-        <img src={imageURL} alt="Logo" className="logo" />
+        <img src={LOGO_API_URL} alt="Logo" className="logo" />
       </div>
     </div>
   );

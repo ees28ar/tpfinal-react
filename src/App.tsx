@@ -9,38 +9,34 @@ import NotFound from './components/Error/NotFound/NotFound';
 import Products from './pages/Products/Products';
 import CreateProducts from './pages/Products/ProductCreate/CreateProducts';
 import IdEditP from './pages/Products/ProductEdit/IdEdit/IdEditP';
-import IdProducts from './pages/Products/ProductsDetails/IdProducts';
 import Layout from './components/Layout/Layout';
 import { QueryClient, QueryClientProvider } from 'react-query';
+
+import RequireAuth from './pages/Auth/RequireAuth';
+import AuthProvider from './pages/Auth/AuthContext';
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            element={
-              <div>
-                <hr />
-                <Layout />
-              </div>
-            }
-          >
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/cartdetail" element={<Cartdetail />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/products/create" element={<CreateProducts />} />
-            <Route path="products/edit/:id" element={<IdEditP />} />
-            <Route path="/products/:id" element={<IdProducts />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
+              <Route path="products" element={<Products />} />
+              <Route path="categories" element={<Categories />} />
+              <Route path="cartdetail" element={<RequireAuth><Cartdetail /></RequireAuth>} />
+              <Route path="products/create" element={<RequireAuth><CreateProducts /></RequireAuth>} />
+              <Route path="products/edit/:id" element={<RequireAuth><IdEditP /></RequireAuth>} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

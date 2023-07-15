@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { fetchData } from '../../ApiUtils/apiUtils';
-import { QUERY_KEY_PRODUCT } from '../../constants/constants';
-import LoadingErrorComponent from '../../components/Error/LoadingErrorComponent/LoadingErrorComponent';
+import { QUERY_KEY_CATEGORIES, QUERY_KEY_PRODUCT, CATEGORY_API_URL, PRODUCT_API_URL } from '../../constants/constants';
+import LoadingErrorComponent from '../../components/Error/LoadingComponent/LoadingErrorComponent';
 import ProductItem from './ProductItem';
+import { useLocation } from 'react-router-dom';
+import './idProducts.css';
 
 type Product = {
   id: number;
@@ -18,14 +20,27 @@ type Product = {
   images: string[];
 };
 
+type Category = {
+  id: number;
+  name: string;
+};
+
 function Products() {
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const location = useLocation();
+  const categoryId = location.state?.categoryId || '';
+
+  const [selectedCategory, setSelectedCategory] = useState(categoryId);
   const [selectedPrice, setSelectedPrice] = useState('');
   const [selectedTitle, setSelectedTitle] = useState('');
   const [priceRange, setPriceRange] = useState<{ min: string; max: string }>({ min: '', max: '' });
 
+  const { data: categories } = useQuery<Category[]>(QUERY_KEY_CATEGORIES, async () => {
+    const data = await fetchData<Category[]>(CATEGORY_API_URL);
+    return data;
+  });
+
   const { data: products, isLoading, isError, error } = useQuery<Product[]>([QUERY_KEY_PRODUCT, selectedCategory, selectedPrice, selectedTitle, priceRange], async () => {
-    let url = 'https://api.escuelajs.co/api/v1/products';
+    let url = PRODUCT_API_URL;
     const queryParams: string[] = [];
     if (selectedCategory) {
       queryParams.push(`categoryId=${selectedCategory}`);
@@ -71,7 +86,6 @@ function Products() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
   };
 
   return (
@@ -89,11 +103,11 @@ function Products() {
             <label htmlFor="category">Category</label>
             <select id="category" name="category" value={selectedCategory} onChange={handleCategoryChange}>
               <option value="">All</option>
-              <option value="1">Category 1</option>
-              <option value="2">Electronics</option>
-              <option value="3">Furniture</option>
-              <option value="4">Shoes</option>
-              <option value="5">Others</option>
+              {categories?.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
             </select>
           </div>
           <div className="form-group">
@@ -107,23 +121,11 @@ function Products() {
           <div className="form-group">
             <p className="Price-Range">Price Range</p>
             <label htmlFor="price_min">Min Price</label>
-            <input
-              type="number"
-              id="price_min"
-              name="min"
-              value={priceRange.min}
-              onChange={handlePriceRangeChange}
-            />
+            <input type="number" id="price_min" name="min" value={priceRange.min} onChange={handlePriceRangeChange} />
           </div>
           <div className="form-group">
             <label htmlFor="price_max">Max Price</label>
-            <input
-              type="number"
-              id="price_max"
-              name="max"
-              value={priceRange.max}
-              onChange={handlePriceRangeChange}
-            />
+            <input type="number" id="price_max" name="max" value={priceRange.max} onChange={handlePriceRangeChange} />
           </div>
           <p></p>
         </form>
