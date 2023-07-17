@@ -30,7 +30,9 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<UserLoginDataResponse | null>(null);
+  const storedToken = localStorage.getItem(ACCESS_TOKEN);
+  const initialState = storedToken ? JSON.parse(storedToken) as UserLoginDataResponse : null;
+  const [user, setUser] = useState<UserLoginDataResponse | null>(initialState);
 
   const signin = (newUser: UserLoginDataResponse, callback?: VoidFunction) => {
     setUser(newUser);
@@ -48,19 +50,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem(ACCESS_TOKEN);
-    if (storedToken) {
-      try {
-        const parsedToken = JSON.parse(storedToken) as UserLoginDataResponse;
-        setUser(parsedToken);
-      } catch (error) {
-        console.error('Error parsing token:', error);
-        localStorage.removeItem(ACCESS_TOKEN);
-      }
-    }
-  }, []);
-
+  
   const value: AuthContextType = {
     user,
     signin,

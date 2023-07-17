@@ -1,24 +1,13 @@
 import React from 'react';
 import { ERROR_IMAGE_URL } from '../../constants/constants';
+import { Product } from './Types';
 
-type Product = {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  category: {
-    id: number;
-    name: string;
-    image: string;
-  };
-  images: string[];
-};
 
 type ProductItemProps = {
   product: Product;
 };
 
-const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
+const ProductItem: React.FC<ProductItemProps> = ({ product }) =>{
   return (
     <div className="product-container">
       <div className="product-image-container">

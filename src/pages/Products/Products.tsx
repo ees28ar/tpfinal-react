@@ -6,19 +6,8 @@ import LoadingErrorComponent from '../../components/Error/LoadingComponent/Loadi
 import ProductItem from './ProductItem';
 import { useLocation } from 'react-router-dom';
 import './idProducts.css';
+import { Product } from './Types';
 
-type Product = {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  category: {
-    id: number;
-    name: string;
-    image: string;
-  };
-  images: string[];
-};
 
 type Category = {
   id: number;

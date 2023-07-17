@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Link } from 'react-router-dom';
 import { LOGO_API_URL } from '../../constants/constants'
 import "./Home.css"
