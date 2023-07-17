@@ -1,0 +1,45 @@
+.nav-container.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  ;
+}
+
+.nav .avatar2 {
+  width: 100px;
+  height: auto;
+}
+
+.nav .nav-links {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  margin-right: 30px;
+}
+
+.nav .nav-links li {
+  margin-left: 10px;
+}
+
+.nav .nav-divider {
+  margin-top: 10px;
+}
+
+
+.nav .nav-links li a {
+  color: #000000;
+  text-decoration: none;
+}
+
+.nav .nav-links li a:hover {
+  color: #ff0000;
+}
+
