@@ -105,3 +105,25 @@ margin-bottom: 1px;
   background-color: #0056b3;
 }
 
+.edit-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #dc8972;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background-color: #c02f07;
+}
+
+.edit-button:active {
+  background-color: #a01f05;
+}
+
+.edit-button:focus {
+  outline: none;
+}

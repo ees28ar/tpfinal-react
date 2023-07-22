@@ -8,12 +8,14 @@ import Categories from './pages/Categories/Categories';
 import NotFound from './components/Error/NotFound/NotFound';
 import Products from './pages/Products/Products';
 import CreateProducts from './pages/Products/ProductCreate/CreateProducts';
-import IdEditP from './pages/Products/ProductEdit/IdEdit/IdEditP';
+import EditProduct from './pages/Products/ProductEdit/IdEdit/EditProduct';
 import Layout from './components/Layout/Layout';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 import RequireAuth from './pages/Auth/RequireAuth';
 import AuthProvider from './pages/Auth/AuthContext';
+import CreateCategories from './pages/Categories/CategoriesCreate/CreateCategories';
+import EditCategories from './pages/Categories/CategoriesEdit/EditCategories';
 
 const queryClient = new QueryClient();
 
@@ -30,8 +32,10 @@ function App() {
               <Route path="products" element={<Products />} />
               <Route path="categories" element={<Categories />} />
               <Route path="cartdetail" element={<RequireAuth><Cartdetail /></RequireAuth>} />
-              <Route path="products/create" element={<RequireAuth><CreateProducts /></RequireAuth>} />
-              <Route path="products/edit/:id" element={<RequireAuth><IdEditP /></RequireAuth>} />
+              <Route path="products/create" element={<RequireAuth><CreateProducts/></RequireAuth>} />
+              <Route path="products/edit/:id" element={<RequireAuth><EditProduct/></RequireAuth>} />
+              <Route path="categories/create" element={<RequireAuth><CreateCategories/></RequireAuth>} />
+              <Route path="categories/edit/:id" element={<RequireAuth><EditCategories/></RequireAuth>} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
