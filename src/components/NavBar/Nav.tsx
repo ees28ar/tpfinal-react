@@ -20,7 +20,10 @@ function Nav() {
           <Link to="/categories">Categories</Link>
         </li>
         <li>
-          <Link to="/cartdetail">Cartdetail</Link>
+          <Link to="products/create">Create Products</Link>
+        </li>
+        <li>
+          <Link to="categories/create">Create Categories</Link>
         </li>
         <li>
           <Link to="/login">Login</Link>

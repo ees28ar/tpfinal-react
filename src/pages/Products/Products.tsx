@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useQuery } from 'react-query';
-import { fetchData } from '../../ApiUtils/apiUtils';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { fetchData, useAdminCheck } from '../../ApiUtils/apiUtils';
 import { QUERY_KEY_CATEGORIES, QUERY_KEY_PRODUCT, CATEGORY_API_URL, PRODUCT_API_URL } from '../../constants/constants';
 import LoadingErrorComponent from '../../components/Error/LoadingComponent/LoadingErrorComponent';
 import ProductItem from './ProductItem';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './idProducts.css';
 import { Product } from './Types';
-
+import { Link } from 'react-router-dom';
 
 type Category = {
   id: number;
@@ -15,8 +15,11 @@ type Category = {
 };
 
 function Products() {
+  const isAdmin = useAdminCheck();
+  const navigate = useNavigate();
   const location = useLocation();
-  const categoryId = location.state?.categoryId || '';
+  const queryParams = new URLSearchParams(location.search);
+  const categoryId = queryParams.get('categoryId') || '';
 
   const [selectedCategory, setSelectedCategory] = useState(categoryId);
   const [selectedPrice, setSelectedPrice] = useState('');
@@ -28,30 +31,33 @@ function Products() {
     return data;
   });
 
-  const { data: products, isLoading, isError, error } = useQuery<Product[]>([QUERY_KEY_PRODUCT, selectedCategory, selectedPrice, selectedTitle, priceRange], async () => {
-    let url = PRODUCT_API_URL;
-    const queryParams: string[] = [];
-    if (selectedCategory) {
-      queryParams.push(`categoryId=${selectedCategory}`);
+  const { data: products, isLoading, isError, error } = useQuery<Product[]>(
+    [QUERY_KEY_PRODUCT, selectedCategory, selectedPrice, selectedTitle, priceRange],
+    async () => {
+      let url = PRODUCT_API_URL;
+      const queryParams: string[] = [];
+      if (selectedCategory) {
+        queryParams.push(`categoryId=${selectedCategory}`);
+      }
+      if (selectedPrice) {
+        queryParams.push(`price=${selectedPrice}`);
+      }
+      if (selectedTitle) {
+        queryParams.push(`title=${selectedTitle}`);
+      }
+      if (priceRange.min) {
+        queryParams.push(`price_min=${priceRange.min}`);
+      }
+      if (priceRange.max) {
+        queryParams.push(`price_max=${priceRange.max}`);
+      }
+      if (queryParams.length > 0) {
+        url += `?${queryParams.join('&')}`;
+      }
+      const data = await fetchData<Product[]>(url);
+      return data;
     }
-    if (selectedPrice) {
-      queryParams.push(`price=${selectedPrice}`);
-    }
-    if (selectedTitle) {
-      queryParams.push(`title=${selectedTitle}`);
-    }
-    if (priceRange.min) {
-      queryParams.push(`price_min=${priceRange.min}`);
-    }
-    if (priceRange.max) {
-      queryParams.push(`price_max=${priceRange.max}`);
-    }
-    if (queryParams.length > 0) {
-      url += `?${queryParams.join('&')}`;
-    }
-    const data = await fetchData<Product[]>(url);
-    return data;
-  });
+  );
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategory(e.target.value);
@@ -75,6 +81,32 @@ function Products() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+  };
+
+  const queryClient = useQueryClient();
+
+  const deleteProductMutation = useMutation(
+    async (productId: number) => {
+      await fetch(`${PRODUCT_API_URL}/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        },
+      });
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([QUERY_KEY_PRODUCT, selectedCategory, selectedPrice, selectedTitle, priceRange]);
+        navigate('/products');
+      },
+    }
+  );
+
+  const handleDeleteProduct = (productId: number) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      deleteProductMutation.mutate(productId);
+    }
   };
 
   return (
@@ -110,18 +142,41 @@ function Products() {
           <div className="form-group">
             <p className="Price-Range">Price Range</p>
             <label htmlFor="price_min">Min Price</label>
-            <input type="number" id="price_min" name="min" value={priceRange.min} onChange={handlePriceRangeChange} />
+            <input
+              type="number"
+              id="price_min"
+              name="min"
+              value={priceRange.min}
+              onChange={handlePriceRangeChange}
+            />
           </div>
           <div className="form-group">
             <label htmlFor="price_max">Max Price</label>
-            <input type="number" id="price_max" name="max" value={priceRange.max} onChange={handlePriceRangeChange} />
+            <input
+              type="number"
+              id="price_max"
+              name="max"
+              value={priceRange.max}
+              onChange={handlePriceRangeChange}
+            />
           </div>
           <p></p>
         </form>
       </div>
       <div className="products-list">
         {products?.map((product: Product) => (
-          <ProductItem key={product.id} product={product} />
+          <div key={product.id} className="product-item">
+            <ProductItem product={product} />
+            <Link to={`/products/edit/${product.id}`} className="edit-button">
+              Editar
+            </Link>
+            {/* Muestra el botón "Eliminar" solo si el usuario tiene rol de Administrador */}
+            {isAdmin && (
+              <button className="delete-button" onClick={() => handleDeleteProduct(product.id)}>
+                Eliminar
+              </button>
+            )}
+          </div>
         ))}
       </div>
     </div>
