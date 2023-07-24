@@ -11,56 +11,37 @@ function CreateCategories() {
   const queryClient = useQueryClient();
   const [categoryName, setCategoryName] = useState('');
   const [categoryImage, setCategoryImage] = useState('');
-  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>(''); 
   const [success, setSuccess] = useState(false);
 
-  
-
   const createCategoryMutation = useMutation(
     async (categoryData: any) => {
-      setLoading(true);
-      setError(''); 
-      setSuccess(false);
-      try {
-        await fetch(CATEGORY_API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(categoryData),
-        });
-
+      await fetch(CATEGORY_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(categoryData),
+      });
+    },
+    {
+      onSuccess: () => {
         setSuccess(true);
-        
         queryClient.invalidateQueries(QUERY_KEY_CATEGORIES);
-        navigate('/products');
-      } catch (error) {
+        navigate('/categories');
+      },
+      onError: () => {
         setError('Error creating categories. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    });
-
-  if (!isAdmin) {
-    return (
-      <div>
-        <h2 className="title1">Only administrators can create categories.</h2>
-        <p className="Subtitle2">You will be redirected to the homepage.</p>
-        {setTimeout(() => {
-          navigate('/');
-        }, 3000)}
-      </div>
-    );
-  }
+      },
+    }
+  );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
     setSuccess(false);
     setLoading(true);
-
 
     const categoryData = {
       name: categoryName,
@@ -73,22 +54,26 @@ function CreateCategories() {
       return;
     }
 
-      try {
+    try {
       await createCategoryMutation.mutateAsync(categoryData);
-      setCategoryName('');
-      setCategoryImage('');
-      setLoading(false);
-      setError('');
-      setSuccess(true);
-
-     queryClient.invalidateQueries(QUERY_KEY_CATEGORIES);
-      navigate('/categories');
     } catch (error) {
-      setLoading(false);
       setError('Error creating category. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (!isAdmin) {
+    return (
+      <div>
+        <h2 className="title1">Only administrators can create categories.</h2>
+        <p className="Subtitle2">You will be redirected to the homepage.</p>
+        {setTimeout(() => {
+          navigate('/');
+        }, 3000)}
+      </div>
+    );
+  }
   return (
     <div id="create-products-container">
         <div id="create-products-form-container">

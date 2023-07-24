@@ -12,34 +12,35 @@ type Category = {
 };
 
 function EditCategory() {
-    const navigate = useNavigate();
-    const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
   const [categoryName, setCategoryName] = useState('');
   const [categoryImage, setCategoryImage] = useState('');
 
-  useQuery<Category>(['category', id], async () => {
+  const { data: categoryData } = useQuery<Category>(['category', id], async () => {
     const data = await fetchData<Category>(`${CATEGORY_API_URL}/${id}`);
     return data;
   });
 
   const updateCategoryMutation = useMutation(
     async (categoryData: Partial<Category>) => {
-      try {
-        await fetch(`${CATEGORY_API_URL}/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(categoryData),
-        });
-      } catch (error) {
-        console.error('Error updating category:', error);
-        throw new Error('Error updating category. Please try again.');
-      } finally {
+      await fetch(`${CATEGORY_API_URL}/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(categoryData),
+      });
+    },
+    {
+      onSuccess: () => {
         queryClient.invalidateQueries(['category', id]);
         navigate('/categories');
-      }
+      },
+      onError: (error: Error) => {
+        console.error('Error updating category:', error);
+      },
     }
   );
 
@@ -53,6 +54,10 @@ function EditCategory() {
 
     updateCategoryMutation.mutate(updatedCategoryData);
   };
+
+  if (!categoryData) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div id="edit-category-container">

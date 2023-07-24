@@ -20,21 +20,14 @@ function CreateProducts() {
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState(0);
   const [images, setImages] = useState<string[]>([]);
- 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
 
   const { data: categories } = useQuery<Category[]>(QUERY_KEY_CATEGORIES, async () => {
     const data = await fetchData<Category[]>(CATEGORY_API_URL);
     return data;
   });
 
-  const createProductMutation = useMutation(async (productData: any) => {
-    setLoading(true);
-    setError('');
-    setSuccess(false);
-    try {
+  const createProductMutation = useMutation(
+    async (productData: any) => {
       await fetch(PRODUCT_API_URL, {
         method: 'POST',
         headers: {
@@ -43,21 +36,21 @@ function CreateProducts() {
         },
         body: JSON.stringify(productData),
       });
-      setSuccess(true);
-      queryClient.invalidateQueries(QUERY_KEY_CATEGORIES);
-      navigate('/products');
-    } catch (error) {
-      setError('Error creating product. Please try again.');
-    } finally {
-      setLoading(false);
+    },
+    {
+      
+      onSuccess: () => {
+        queryClient.invalidateQueries(QUERY_KEY_CATEGORIES);
+        navigate('/products');
+      },
+          onError: (error: Error) => {
+        console.error('Error creating product:', error);
+      },
     }
-  });
+  );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError('');
-    setSuccess(false);
-    setLoading(true);
 
     const productData = {
       title,
@@ -74,19 +67,11 @@ function CreateProducts() {
       setDescription('');
       setCategoryId(0);
       setImages([]);
-      setLoading(false);
-      setError('');
-      setSuccess(true);
-
-      queryClient.invalidateQueries(QUERY_KEY_CATEGORIES);
-      navigate('/products');
     } catch (error) {
-      setLoading(false);
-      setError('Error creating product. Please try again.');
+      console.error('Error creating product:', error);
     }
   };
-
- 
+  
   if (!isAdmin) {
     return (
       <div>
@@ -101,49 +86,48 @@ function CreateProducts() {
 
   return (
     <div id="create-products-container">
-         <div id="create-products-form-container">
-          <h1 className="create-products-title">Create Product</h1>
-          <form onSubmit={handleSubmit} id="create-products-form">
-            <label>
-              Title: <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            </label>
-            <br />
-            <label>
-              Price: <input type="number" id="price" value={price} onChange={(e) => setPrice(Number(e.target.value))} required />
-            </label>
-            <br />
-            <label>
-              Description: <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required />
-            </label>
-            <br />
-            <label>
-              Category:
-              <select id="category" value={categoryId} onChange={(e) => setCategoryId(Number(e.target.value))} required>
-                <option value="">Select a category</option>
-                {categories?.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <br />
-            <label>
-              Images: <input type="text" id="images" value={images.join(',')} onChange={(e) => setImages(e.target.value.split(','))} required />
-            </label>
-            <br />
-            {loading && (
-              <div className="loading-container">
-                <CirclesWithBar height={300} width={300} color="#5E1D0B" />
-                <h1>Cargando...</h1>
-              </div>
-            )}
-            {error && <p className="error">{error}</p>}
-            {success && <p className="success">Product created successfully!</p>}
-            <button type="submit">Create</button>
-          </form>
-        </div>
-      )
+      <div id="create-products-form-container">
+        <h1 className="create-products-title">Create Product</h1>
+        <form onSubmit={handleSubmit} id="create-products-form">
+          <label>
+            Title: <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </label>
+          <br />
+          <label>
+            Price: <input type="number" id="price" value={price} onChange={(e) => setPrice(Number(e.target.value))} required />
+          </label>
+          <br />
+          <label>
+            Description: <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required />
+          </label>
+          <br />
+          <label>
+            Category:
+            <select id="category" value={categoryId} onChange={(e) => setCategoryId(Number(e.target.value))} required>
+              <option value="">Select a category</option>
+              {categories?.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <br />
+          <label>
+            Images: <input type="text" id="images" value={images.join(',')} onChange={(e) => setImages(e.target.value.split(','))} required />
+          </label>
+          <br />
+          {createProductMutation.isLoading && (
+            <div className="loading-container">
+              <CirclesWithBar height={300} width={300} color="#5E1D0B" />
+              <h1>Cargando...</h1>
+            </div>
+          )}
+          {createProductMutation.isError && <p className="error">Error creating product. Please try again.</p>}
+          {createProductMutation.isSuccess && <p className="success">Product created successfully!</p>}
+          <button type="submit">Create</button>
+        </form>
+      </div>
     </div>
   );
 }

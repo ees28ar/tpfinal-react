@@ -9,8 +9,6 @@ export async function fetchData<T>(url: string): Promise<T> {
 }
 
 import axios from 'axios';
-import { useEffect, useState } from 'react';
-
 export async function getAccessToken(): Promise<string | null> {
   try {
     const response = await axios.get('https://api.escuelajs.co/api/v1/auth/profile', {
@@ -25,25 +23,23 @@ export async function getAccessToken(): Promise<string | null> {
   }
 }
 
+import { useQuery } from 'react-query';
+
 export function useAdminCheck() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const isAdminQuery = useQuery<boolean>('isAdmin', async () => {
+    try {
+      const response = await fetch('https://api.escuelajs.co/api/v1/auth/profile', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        },
+      });
+      const profileData = await response.json();
+      return profileData.role === 'admin';
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      throw new Error('Error fetching profile. Please try again.');
+    }
+  });
 
-  useEffect(() => {
-    const getProfile = async () => {
-      try {
-        const response = await fetch('https://api.escuelajs.co/api/v1/auth/profile', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-          },
-        });
-        const profileData = await response.json();
-        setIsAdmin(profileData.role === 'admin');
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      }
-    };
-    getProfile();
-  }, []);
-
-  return isAdmin;
+  return isAdminQuery.data ?? false;
 }

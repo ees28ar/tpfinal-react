@@ -35,10 +35,16 @@ function Categories() {
       } catch (error) {
         console.error('Error deleting category:', error);
         throw new Error('Error deleting category. Please try again.');
-      } finally {
-        queryClient.invalidateQueries(QUERY_KEY_CATEGORIES);
-        navigate('/categories');
       }
+    },
+    {
+        onSuccess: () => {
+        queryClient.invalidateQueries(QUERY_KEY_CATEGORIES);
+      },
+    
+      onError: (error: Error) => {
+        console.error('Error deleting category:', error);
+      },
     }
   );
 
@@ -48,7 +54,6 @@ function Categories() {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
         await deleteCategoryMutation.mutateAsync(categoryId);
-        queryClient.invalidateQueries(QUERY_KEY_CATEGORIES);
         navigate('/categories');
       } catch (error) {
         console.error('Error deleting category:', error);
