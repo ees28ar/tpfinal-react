@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './idProducts.css';
 import { Product } from './Types';
 import { Link } from 'react-router-dom';
+import { useCart } from '../CartDetails/CartProvider'; 
 
 type Category = {
   id: number;
@@ -102,6 +103,7 @@ function Products() {
       },
     }
   );
+  const { addToCart } = useCart(); 
 
   const handleDeleteProduct = (productId: number) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
@@ -170,12 +172,12 @@ function Products() {
             <Link to={`/products/edit/${product.id}`} className="edit-button">
               Editar
             </Link>
-            {/* Muestra el botón "Eliminar" solo si el usuario tiene rol de Administrador */}
             {isAdmin && (
               <button className="delete-button" onClick={() => handleDeleteProduct(product.id)}>
                 Eliminar
               </button>
             )}
+            <button onClick={() => addToCart(product)}>Agregar al carrito</button>
           </div>
         ))}
       </div>
