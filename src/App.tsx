@@ -16,6 +16,8 @@ import RequireAuth from './pages/Auth/RequireAuth';
 import AuthProvider from './pages/Auth/AuthContext';
 import CreateCategories from './pages/Categories/CategoriesCreate/CreateCategories';
 import EditCategories from './pages/Categories/CategoriesEdit/EditCategories';
+import { CartProvider } from './pages/CartDetails/CartProvider';
+
 
 const queryClient = new QueryClient();
 
@@ -23,13 +25,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+      <CartProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
-              <Route path="products" element={<Products />} />
+              <Route path="products"element={<Products />}/>
               <Route path="categories" element={<Categories />} />
               <Route path="cartdetail" element={<RequireAuth><Cartdetail /></RequireAuth>} />
               <Route path="products/create" element={<RequireAuth><CreateProducts/></RequireAuth>} />
@@ -40,6 +43,7 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        </CartProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

@@ -2,12 +2,11 @@ import React from 'react';
 import { ERROR_IMAGE_URL } from '../../constants/constants';
 import { Product } from './Types';
 
-
 type ProductItemProps = {
   product: Product;
 };
 
-const ProductItem: React.FC<ProductItemProps> = ({ product }) =>{
+const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
   return (
     <div className="product-container">
       <div className="product-image-container">
@@ -19,7 +18,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) =>{
             alt={`Product ${product.id} Image ${index}`}
             onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
               const target = e.target as HTMLImageElement;
-              target.src = ERROR_IMAGE_URL;
+              target.src = ERROR_IMAGE_URL; 
             }}
           />
         ))}
