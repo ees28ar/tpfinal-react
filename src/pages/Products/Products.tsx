@@ -103,8 +103,8 @@ function Products() {
       },
     }
   );
-  const { addToCart } = useCart(); 
-
+  const { addToCart } = useCart();
+  
   const handleDeleteProduct = (productId: number) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       deleteProductMutation.mutate(productId);
