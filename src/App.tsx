@@ -17,6 +17,7 @@ import AuthProvider from './pages/Auth/AuthContext';
 import CreateCategories from './pages/Categories/CategoriesCreate/CreateCategories';
 import EditCategories from './pages/Categories/CategoriesEdit/EditCategories';
 import { CartProvider } from './pages/CartDetails/CartProvider';
+import Finish from './pages/CartDetails/Finish';
 
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ function App() {
               <Route path="products"element={<Products />}/>
               <Route path="categories" element={<Categories />} />
               <Route path="cartdetail" element={<RequireAuth><Cartdetail /></RequireAuth>} />
+              <Route path="finish" element={<RequireAuth><Finish /></RequireAuth>} />
               <Route path="products/create" element={<RequireAuth><CreateProducts/></RequireAuth>} />
               <Route path="products/edit/:id" element={<RequireAuth><EditProduct/></RequireAuth>} />
               <Route path="categories/create" element={<RequireAuth><CreateCategories/></RequireAuth>} />

@@ -37,12 +37,12 @@ function Nav() {
           <Link to="/login">Login</Link>
         </li>
         {/* Muestra la cantidad de productos del carrito y el total en pesos*/}
-        <li>
+      <li>
         <Link to="/cartdetail">
-          Cart <span className="cart-quantity">{totalQuantity }</span>
-          <span className="cart-total-price">  ${totalPrice.toFixed(2)}</span>
+          Cart <span className="cart-quantity">{totalQuantity}</span>
+          <span className="cart-total-price"> ${totalPrice.toFixed(2)}</span>
         </Link>
-        </li>
+      </li>
       </ul>
     </div>
   );
